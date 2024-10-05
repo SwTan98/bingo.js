@@ -8,10 +8,11 @@ const { card } = defineProps<{
 
 <template>
   <div
-    class="flex items-center justify-center aspect-square border border-gray-300 rounded-lg transition-all transform hover:scale-95 touch-none select-none"
+    class="flex items-center justify-center aspect-square rounded-lg drop-shadow transition-all transform hover:scale-95 touch-none select-none"
     :class="{
       'bg-primary-500 text-white': card.isSelected,
-      'bg-white text-black': !card.isSelected,
+      'bg-slate-200 text-black dark:bg-slate-800 dark:text-slate-300':
+        !card.isSelected,
     }"
   >
     <div>

@@ -64,7 +64,15 @@ watchEffect(() => {
 <template>
   <MoleculesGrid :cards="cards" @toggle="toggleCard" />
   <div class="flex gap-4 justify-between">
-    <AtomsButton text="Reset" @click="reset" />
-    <AtomsButton text="Update Seed" @click="updateSeed" />
+    <AtomsButton
+      class="bg-red-500 text-white dark:bg-red-900 dark:text-slate-100"
+      text="Reset"
+      @click="reset"
+    />
+    <AtomsButton
+      class="bg-primary-500 text-white dark:bg-primary-900 dark:text-slate-100"
+      text="Update Seed"
+      @click="updateSeed"
+    />
   </div>
 </template>
