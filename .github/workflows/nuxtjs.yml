@@ -1,6 +1,8 @@
 # https://github.com/actions/deploy-pages#usage
 name: Deploy to GitHub Pages
 on:
+  push:
+    branches: ["master"]
   workflow_dispatch:
   push:
     branches:
