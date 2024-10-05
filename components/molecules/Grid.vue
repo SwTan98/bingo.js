@@ -3,7 +3,7 @@ import { GRID_SIZE } from "~/lib/constants";
 import type { Card } from "~/models/Card";
 
 const { cards } = defineProps<{
-  cards: Card[];
+  cards?: Card[];
 }>();
 
 const emit = defineEmits<{
@@ -11,6 +11,7 @@ const emit = defineEmits<{
 }>();
 
 const toggleCard = (index: number) => {
+  if (!cards) return;
   const wasSelected = cards[index].isSelected;
   emit("toggle", index);
   if (wasSelected) return;
@@ -75,12 +76,14 @@ const checkForBingo = (index: number) => {
 </script>
 
 <template>
-  <div :class="`grid grid-cols-5 gap-2 md:gap-8`">
+  <div class="grid grid-cols-5 gap-2 my-auto w-full">
     <AtomsCard
+      v-if="cards"
       v-for="(card, index) in cards"
       :key="index"
       :card="card"
       @click="toggleCard(index)"
     />
+    <AtomsSkeleton v-else v-for="n in 25" :key="n" />
   </div>
 </template>

@@ -62,7 +62,7 @@ watchEffect(() => {
 </script>
 
 <template>
-  <MoleculesGrid v-if="cards" :cards="cards" @toggle="toggleCard" />
+  <MoleculesGrid :cards="cards" @toggle="toggleCard" />
   <div class="flex gap-4 justify-between">
     <AtomsButton text="Reset" @click="reset" />
     <AtomsButton text="Update Seed" @click="updateSeed" />
