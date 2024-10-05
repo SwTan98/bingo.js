@@ -1,12 +1,18 @@
 <script setup lang="ts">
+import { PHRASES } from "~/lib/constants";
+import { shuffle } from "~/lib/utils";
+import type { Card } from "~/models/Card";
+
 // Define the bingo grid size and create a reactive array for the cards
 const GRID_SIZE = 5; // 5x5 grid
-const cards = ref(
-  Array.from({ length: GRID_SIZE * GRID_SIZE }, (_, i) => ({
-    title: `Card ${i + 1}`,
+const SEED = ref<string>("test");
+const cards = ref<Card[]>(
+  PHRASES.map((title) => ({
+    title,
     isSelected: false,
-  }))
+  })).slice(0, GRID_SIZE ** 2)
 );
+cards.value = shuffle(cards.value, SEED.value);
 
 // Function to toggle card selection
 const toggleCard = (index: number) => {
@@ -78,8 +84,7 @@ const checkForBingo = (index: number) => {
     <AtomsCard
       v-for="(card, index) in cards"
       :key="index"
-      :title="card.title"
-      :isSelected="card.isSelected"
+      :card="card"
       @click="toggleCard(index)"
     />
   </div>
