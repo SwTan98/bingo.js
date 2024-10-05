@@ -1,29 +1,29 @@
 <script setup lang="ts">
-import { PHRASES } from "~/lib/constants";
-import { shuffle } from "~/lib/utils";
+import { GRID_SIZE, PHRASES, CARDS_KEY, SEED_KEY } from "~/lib/constants";
+import { loadItem, saveItem, shuffle } from "~/lib/utils";
 import type { Card } from "~/models/Card";
 
-// Define the bingo grid size and create a reactive array for the cards
-const GRID_SIZE = 5; // 5x5 grid
-const SEED = ref<string>("test");
-const cards = ref<Card[]>(
-  PHRASES.map((title) => ({
+const cards = ref<Card[]>();
+const seed = ref<string>();
+
+const createAndShuffleCards = (seed: string): Card[] => {
+  const newCards = PHRASES.map((title) => ({
     title,
     isSelected: false,
-  })).slice(0, GRID_SIZE ** 2)
-);
-cards.value = shuffle(cards.value, SEED.value);
+  })).slice(0, GRID_SIZE ** 2);
+  return shuffle(newCards, seed);
+};
 
-// Function to toggle card selection
 const toggleCard = (index: number) => {
+  if (!cards.value) return;
   const wasSelected = cards.value[index].isSelected;
   cards.value[index].isSelected = !wasSelected;
   if (wasSelected) return;
   checkForBingo(index);
 };
 
-// Function to check for bingo based on the affected card
 const checkForBingo = (index: number) => {
+  if (!cards.value) return;
   const selectedCards = cards.value.map((card) => card.isSelected);
 
   const row = Math.floor(index / GRID_SIZE);
@@ -77,6 +77,22 @@ const checkForBingo = (index: number) => {
     }
   }
 };
+
+onMounted(() => {
+  const loadedSeed = loadItem(SEED_KEY) ?? "test";
+  seed.value = loadedSeed;
+  cards.value = loadItem(CARDS_KEY) ?? createAndShuffleCards(loadedSeed);
+});
+
+watchEffect(() => {
+  if (!cards.value) return;
+  saveItem(CARDS_KEY, cards.value);
+});
+
+watchEffect(() => {
+  if (!seed.value) return;
+  saveItem(SEED_KEY, seed.value);
+});
 </script>
 
 <template>

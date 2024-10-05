@@ -10,3 +10,12 @@ export const shuffle = (array: Card[], seed: string | number): Card[] => {
   const shuffle = createShuffle(numberSeed);
   return shuffle(array);
 };
+
+export const saveItem = (key: string, value: any) => {
+  localStorage.setItem(key, JSON.stringify(value));
+};
+
+export const loadItem = (key: string) => {
+  const item = localStorage.getItem(key);
+  if (item) return JSON.parse(item);
+};

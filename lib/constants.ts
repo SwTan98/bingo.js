@@ -1,3 +1,7 @@
+export const GRID_SIZE = 5;
+export const CARDS_KEY = "cards";
+export const SEED_KEY = "test";
+
 export const PHRASES = [
   "Hello together",
   "Ja it's ok",
