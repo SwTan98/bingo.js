@@ -1,5 +1,70 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { CARDS_KEY, GRID_SIZE, PHRASES, SEED_KEY } from "~/lib/constants";
+import { loadItem, saveItem, shuffle } from "~/lib/utils";
+import type { Card } from "~/models/Card";
+
+const seed = ref<string>();
+const cards = ref<Card[]>();
+const isUpdating = ref<Boolean>(false);
+
+const createAndShuffleCards = (seed: string): Card[] => {
+  const newCards = PHRASES.map((title) => ({
+    title,
+    isSelected: false,
+  })).slice(0, GRID_SIZE ** 2);
+  return shuffle(newCards, seed);
+};
+
+const toggleCard = (index: number) => {
+  console.log(index);
+  if (!cards.value) return;
+  const wasSelected = cards.value[index].isSelected;
+  cards.value[index].isSelected = !wasSelected;
+};
+
+const reset = () => {
+  if (!seed.value) return;
+  const confirmed = confirm("Reset bingo sheet?");
+  if (!confirmed) return;
+  cards.value = createAndShuffleCards(seed.value);
+};
+
+const updateSeed = () => {
+  const value = prompt("Updating seed resets your progress.");
+  if (value === null) return;
+  isUpdating.value = true;
+  seed.value = value;
+};
+
+onMounted(() => {
+  seed.value = loadItem(SEED_KEY);
+  cards.value = loadItem(CARDS_KEY);
+
+  if (seed.value) return;
+  const value = prompt("Please enter a seed to start.");
+  if (value === null) return;
+  seed.value = value;
+});
+
+watchEffect(() => {
+  if (!cards.value) return;
+  saveItem(CARDS_KEY, cards.value);
+});
+
+watchEffect(() => {
+  if (!seed.value) return;
+  saveItem(SEED_KEY, seed.value);
+  if (!cards.value || isUpdating.value) {
+    cards.value = createAndShuffleCards(seed.value);
+    isUpdating.value = false;
+  }
+});
+</script>
 
 <template>
-  <MoleculesGrid />
+  <MoleculesGrid v-if="cards" :cards="cards" @toggle="toggleCard" />
+  <div class="flex gap-4 justify-between">
+    <AtomsButton text="Reset" @click="reset" />
+    <AtomsButton text="Update Seed" @click="updateSeed" />
+  </div>
 </template>

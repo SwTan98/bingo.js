@@ -1,30 +1,25 @@
 <script setup lang="ts">
-import { GRID_SIZE, PHRASES, CARDS_KEY, SEED_KEY } from "~/lib/constants";
-import { loadItem, saveItem, shuffle } from "~/lib/utils";
+import { GRID_SIZE } from "~/lib/constants";
 import type { Card } from "~/models/Card";
 
-const cards = ref<Card[]>();
-const seed = ref<string>();
+const { cards } = defineProps<{
+  cards: Card[];
+}>();
 
-const createAndShuffleCards = (seed: string): Card[] => {
-  const newCards = PHRASES.map((title) => ({
-    title,
-    isSelected: false,
-  })).slice(0, GRID_SIZE ** 2);
-  return shuffle(newCards, seed);
-};
+const emit = defineEmits<{
+  toggle: [index: number];
+}>();
 
 const toggleCard = (index: number) => {
-  if (!cards.value) return;
-  const wasSelected = cards.value[index].isSelected;
-  cards.value[index].isSelected = !wasSelected;
+  const wasSelected = cards[index].isSelected;
+  emit("toggle", index);
   if (wasSelected) return;
   checkForBingo(index);
 };
 
 const checkForBingo = (index: number) => {
-  if (!cards.value) return;
-  const selectedCards = cards.value.map((card) => card.isSelected);
+  if (!cards) return;
+  const selectedCards = cards.map((card) => card.isSelected);
 
   const row = Math.floor(index / GRID_SIZE);
   const col = index % GRID_SIZE;
@@ -77,22 +72,6 @@ const checkForBingo = (index: number) => {
     }
   }
 };
-
-onMounted(() => {
-  const loadedSeed = loadItem(SEED_KEY) ?? "test";
-  seed.value = loadedSeed;
-  cards.value = loadItem(CARDS_KEY) ?? createAndShuffleCards(loadedSeed);
-});
-
-watchEffect(() => {
-  if (!cards.value) return;
-  saveItem(CARDS_KEY, cards.value);
-});
-
-watchEffect(() => {
-  if (!seed.value) return;
-  saveItem(SEED_KEY, seed.value);
-});
 </script>
 
 <template>
