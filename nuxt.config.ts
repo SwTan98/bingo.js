@@ -5,10 +5,5 @@ export default defineNuxtConfig({
   modules: ["@nuxtjs/tailwindcss"],
   tailwindcss: {
     configPath: "tailwind.config.ts",
-    exposeConfig: {
-      level: 2,
-    },
-    config: {},
-    viewer: true,
   },
 });
