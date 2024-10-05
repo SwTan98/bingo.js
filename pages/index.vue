@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { CARDS_KEY, GRID_SIZE, PHRASES, SEED_KEY } from "~/lib/constants";
-import { loadItem, saveItem, shuffle } from "~/lib/utils";
+import { generateSeed, loadItem, saveItem, shuffle } from "~/lib/utils";
 import type { Card } from "~/models/Card";
 
 const seed = ref<string>();
@@ -24,16 +24,18 @@ const toggleCard = (index: number) => {
 
 const reset = () => {
   if (!seed.value) return;
-  const confirmed = confirm("Reset bingo sheet?");
+  const confirmed = confirm("RESET bingo sheet?");
   if (!confirmed) return;
   cards.value = createAndShuffleCards(seed.value);
 };
 
 const updateSeed = () => {
-  const value = prompt("Updating seed resets your progress.");
+  const value = prompt(
+    "Updating seed RESETS your progress (Leave blank for random seed)."
+  );
   if (value === null) return;
   isUpdating.value = true;
-  seed.value = value;
+  seed.value = value || generateSeed();
 };
 
 onMounted(() => {
@@ -41,9 +43,10 @@ onMounted(() => {
   cards.value = loadItem(CARDS_KEY);
 
   if (seed.value) return;
-  const value = prompt("Please enter a seed to start.");
-  if (value === null) return;
-  seed.value = value;
+  const value = prompt(
+    "Please enter a seed to start (Leave blank for random seed)."
+  );
+  seed.value = value || generateSeed();
 });
 
 watchEffect(() => {
@@ -65,14 +68,15 @@ watchEffect(() => {
   <MoleculesGrid :cards="cards" @toggle="toggleCard" />
   <div class="flex gap-4 justify-between">
     <AtomsButton
-      class="bg-red-500 text-white dark:bg-red-900 dark:text-slate-100"
+      class="bg-red-500 dark:bg-red-900 text-slate-50"
       text="Reset"
       @click="reset"
     />
     <AtomsButton
-      class="bg-primary-500 text-white dark:bg-primary-900 dark:text-slate-100"
+      class="bg-primary-500 dark:bg-primary-900 text-slate-50"
       text="Update Seed"
       @click="updateSeed"
     />
   </div>
+  <span class="text-xs text-center">Seed: {{ seed }}</span>
 </template>

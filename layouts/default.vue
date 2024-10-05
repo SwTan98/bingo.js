@@ -1,6 +1,6 @@
 <template>
   <div
-    class="min-h-screen flex flex-col items-center bg-slate-100 dark:bg-slate-950"
+    class="min-h-screen flex flex-col items-center bg-slate-100 text-slate-950 dark:bg-slate-950 dark:text-slate-100"
   >
     <nav class="bg-primary-900 text-white w-full">
       <h1 class="text-2xl text-center p-4">Nothing to see here</h1>

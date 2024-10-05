@@ -19,3 +19,5 @@ export const loadItem = (key: string) => {
   const item = localStorage.getItem(key);
   if (item) return JSON.parse(item);
 };
+
+export const generateSeed = () => new Prando().nextString(32);
