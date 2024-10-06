@@ -1,11 +1,17 @@
 <script setup lang="ts">
+import { useDraggable, type UseDraggableReturn } from "vue-draggable-plus";
 import { CARDS_KEY, GRID_SIZE, PHRASES, SEED_KEY } from "~/lib/constants";
 import { generateSeed, loadItem, saveItem, shuffle } from "~/lib/utils";
 import type { Card } from "~/models/Card";
 
 const seed = ref<string>();
 const cards = ref<Card[]>();
+const draggable = ref<UseDraggableReturn>();
 const isUpdating = ref<Boolean>(false);
+const isReordering = ref<Boolean>(false);
+
+// Draggable
+const el = ref<HTMLElement | null>(null);
 
 const createAndShuffleCards = (seed: string): Card[] => {
   const newCards = PHRASES.map((title) => ({
@@ -16,17 +22,25 @@ const createAndShuffleCards = (seed: string): Card[] => {
 };
 
 const toggleCard = (index: number) => {
-  console.log(index);
+  if (isReordering.value) return;
   if (!cards.value) return;
   const wasSelected = cards.value[index].isSelected;
   cards.value[index].isSelected = !wasSelected;
 };
 
 const reset = () => {
+  cards.value = cards.value?.map((card) => ({
+    ...card,
+    isSelected: false,
+  }));
+};
+
+const onReset = () => {
   if (!seed.value) return;
   const confirmed = confirm("RESET bingo sheet?");
   if (!confirmed) return;
-  cards.value = createAndShuffleCards(seed.value);
+  save();
+  reset();
 };
 
 const updateSeed = () => {
@@ -34,8 +48,23 @@ const updateSeed = () => {
     "Updating seed RESETS your progress (Leave blank for random seed)."
   );
   if (value === null) return;
+  save();
   isUpdating.value = true;
   seed.value = value || generateSeed();
+};
+
+const reorder = () => {
+  const confirmed = confirm("Reordering RESETS your progress.");
+  if (!confirmed) return;
+
+  isReordering.value = true;
+  reset();
+  draggable.value?.resume();
+};
+
+const save = () => {
+  draggable.value?.pause();
+  isReordering.value = false;
 };
 
 onMounted(() => {
@@ -48,6 +77,19 @@ onMounted(() => {
   );
   seed.value = value || generateSeed();
 });
+
+watch(
+  cards,
+  () => {
+    draggable.value = useDraggable(el, cards, {
+      animation: 150,
+      disabled: true,
+      ghostClass: "!bg-blue-500",
+      chosenClass: "!bg-blue-400",
+    });
+  },
+  { once: true }
+);
 
 watchEffect(() => {
   if (!cards.value) return;
@@ -65,12 +107,20 @@ watchEffect(() => {
 </script>
 
 <template>
-  <MoleculesGrid :cards="cards" @toggle="toggleCard" />
+  <MoleculesGrid ref="el" :cards="cards" @toggle="toggleCard" />
+  <AtomsButton
+    :class="[
+      'bg-slate-500 dark:bg-slate-900 text-slate-50 grow-0',
+      isReordering && '!bg-primary-800',
+    ]"
+    :text="isReordering ? 'Done' : 'Reorder'"
+    @click="isReordering ? save() : reorder()"
+  />
   <div class="flex gap-4 justify-between">
     <AtomsButton
       class="bg-red-500 dark:bg-red-900 text-slate-50"
       text="Reset"
-      @click="reset"
+      @click="onReset"
     />
     <AtomsButton
       class="bg-primary-500 dark:bg-primary-900 text-slate-50"
