@@ -14,7 +14,7 @@ export const PHRASES = [
   "Under the hood",
   "I will handle it",
   "STOP ✊",
-  "Placeholder 5",
+  "Only for your information",
   "Placeholder 6",
   "Placeholder 7",
   "Placeholder 8",
